@@ -267,9 +267,18 @@ input{width:100%;margin:8px 0;padding:12px;background:#05080E;border:1px solid #
     <div class="mono">1234 5678 9012 3456</div>
 </div>
 <button class="btn" id="paidBtn" style="width:100%;margin-top:20px" onclick="paid()">✅ Я оплатил</button>
-<button class="btn" id="confirmBtn" style="width:100%;margin-top:10px; display:none; background:#00ff88; color:#000" onclick="sendOrder()">📤 Подтвердить заказ</button>
-<p id="confirmHint" style="display:none; color:#aaa; font-size:0.9em; margin-top:5px; text-align:center;">После нажатия откроется чат с ботом — нажмите «Отправить»</p>
 <button class="btn" style="width:100%;margin-top:10px;background:#444;color:white" onclick="showPage('home')">❌ Я передумал</button>
+</section>
+
+<section id="finalOrder" class="page">
+<div onclick="showPage('home')" style="margin-bottom:14px;cursor:pointer">← BACK</div>
+<h1>📋 Ваш заказ</h1>
+<div class="card" style="text-align:center;">
+    <p style="margin-bottom:10px;">Скопируйте текст заказа, откройте чат с ботом, вставьте и отправьте.</p>
+    <pre id="orderText" style="background:#05080E;padding:15px;border-radius:12px;text-align:left;white-space:pre-wrap;word-wrap:break-word;color:#fff;"></pre>
+    <button class="btn" style="width:100%;margin-top:10px;" onclick="copyOrderText()">📋 Скопировать текст</button>
+    <button class="btn" style="width:100%;margin-top:10px; background:#444; color:white;" onclick="openBotChat()">💬 Открыть чат с ботом</button>
+</div>
 </section>
 
 <div class="footer">
@@ -479,45 +488,59 @@ function paid() {
     alert("Ошибка: товар не выбран");
     return;
   }
-  
-  // Скрываем кнопку "Я оплатил"
+  // Скрываем кнопку "Я оплатил" на странице оплаты (на всякий случай, если вернётся назад)
   document.getElementById('paidBtn').style.display = 'none';
-  
-  // Показываем кнопку "Подтвердить заказ" и подсказку
-  document.getElementById('confirmBtn').style.display = 'block';
-  document.getElementById('confirmHint').style.display = 'block';
-}
-function sendOrder() {
+
   const gameId = window.savedGameId || "не указан";
   const username = window.savedUsername || "не указан";
 
-  const data = {
-    gameId: gameId,
-    username: username,
-    product: selected.name || "не указан",
-    price: selected.price || 0
-  };
+  // Формируем текст заказа
+  const orderText = `НОВЫЙ ЗАКАЗ
 
-  if (window.Telegram?.WebApp) {
-    // Отправляем данные боту (sendData работает, домен подтверждён)
-    Telegram.WebApp.sendData(JSON.stringify(data));
+🎮 Товар: ${selected.name}
+💰 Цена: $${selected.price}
+🆔 Game ID: ${gameId}
+👤 Username: @${username}`;
 
-    // Прячем кнопки
-    document.getElementById('confirmBtn').style.display = 'none';
-    document.getElementById('confirmHint').style.display = 'none';
-    document.getElementById('paidBtn').style.display = 'none';
+  // Вставляем текст в pre
+  document.getElementById('orderText').textContent = orderText;
+  // Показываем финальную страницу
+  showPage('finalOrder');
+}
 
-    // Закрываем WebApp, чтобы покупатель вернулся в чат
-    Telegram.WebApp.close();
+function copyOrderText() {
+  const text = document.getElementById('orderText').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('✅ Текст скопирован!'))
+      .catch(() => alert('⚠️ Не удалось скопировать. Скопируйте вручную.'));
   } else {
-    alert("Откройте магазин через Telegram!");
+    // Fallback для старых браузеров
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('✅ Текст скопирован!');
   }
 }
 
-function closeThanks(){
-  thanksSheet.classList.remove('open');
-  thanksOverlay.classList.remove('show');
+function openBotChat() {
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.openTelegramLink('https://t.me/leaky_mortarShopBot');
+  } else {
+    window.open('https://t.me/leaky_mortarShopBot', '_blank');
+  }
+}
+
+function finishOrder() {
+  alert('Спасибо! Администратор скоро свяжется с вами.');
   showPage('home');
+  // Можно также закрыть WebApp:
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.close();
+  }
 }
 </script>
 </body>
