@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#05080E;--card:#080F1C;--accent:#00C3FF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#fff;font-family:Inter,sans-serif}
+.app{max-width:430px;margin:auto;min-height:100vh;background:linear-gradient(#040812,#05080E)}
+.header{position:sticky;top:0;display:flex;justify-content:space-between;padding:16px;background:rgba(5,8,14,.95);border-bottom:1px solid #10253a}
+.logo{font-weight:800;letter-spacing:2px}
+.glow{color:var(--accent);text-shadow:0 0 12px var(--accent)}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.hero{height:300px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.orb{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#11d7ff,#055a7a);box-shadow:0 0 40px #00c3ff;margin-bottom:30px}
+.title{font-size:2rem;font-weight:800}
+.ticker{overflow:hidden;border-top:1px solid #123;border-bottom:1px solid #123;padding:10px 0;color:var(--accent);font-family:"JetBrains Mono",monospace}
+.track{display:inline-block;white-space:nowrap;animation:scroll 18s linear infinite}
+@keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.card{background:var(--card);border:1px solid #10253a;border-radius:18px;padding:14px;margin:12px 0;cursor:pointer;transition:.25s}
+.card:hover,.card.selected{border-color:var(--accent);box-shadow:0 0 18px rgba(0,195,255,.45)}
+.card img{width:100%;height:120px;object-fit:cover;border-radius:12px;margin-bottom:10px}
+.small{opacity:.7}
+.mono{font-family:"JetBrains Mono",monospace}
+.badge{background:#ff6a00;color:#fff;padding:3px 8px;border-radius:999px;font-size:.75rem}
+.bottomBar{
+position:fixed;
+bottom:0;
+left:50%;
+transform:translate(-50%,100%);
+opacity:0;
+max-width:430px;
+width:100%;
+background:#08111f;
+border-top:1px solid #123;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+transition:.35s;
+pointer-events:none;
+z-index: 100;
+will-change: transform, opacity;
+}
+
+.bottomBar.show{
+transform:translate(-50%,0);
+opacity:1;
+pointer-events:auto;
+}
+.btn{
+background:var(--accent);
+color:#00131a;
+border:none;
+padding:12px 18px;
+border-radius:12px;
+font-weight:800;
+cursor:pointer;
+box-shadow:0 0 18px rgba(0,195,255,.55);
+transition:.2s;
+}
+
+.btn:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px rgba(0,195,255,.8);
+}
+
+.sheet{
+position:fixed;
+bottom:0;
+left:50%;
+transform:translate(-50%,100%);
+max-width:430px;
+width:100%;
+height:80vh;
+background:#091220;
+padding:20px;
+border-radius:24px 24px 0 0;
+transition:.35s;
+z-index:100;
+overflow-y:auto;
+box-shadow:0 -10px 40px rgba(0,0,0,.5);
+transition: transform .25s ease;
+}
+
+.sheetHandle{
+    width:60px;
+    height:5px;
+    background:#3a4b5f;
+    border-radius:999px;
+    margin:0 auto 20px;
+}
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(3px);
+  opacity:0;
+  visibility:hidden;
+  transition:.35s;
+  z-index:90;
+}
+
+.overlay.show{
+  opacity:1;
+  visibility:visible;
+}
+.sheet.open{transform:translate(-50%,0)}
+input{width:100%;margin:8px 0;padding:12px;background:#05080E;border:1px solid #123;color:#fff;border-radius:10px}
+
+.agreement{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-top:15px;
+    font-size:.9rem;
+    color:#b8c7d9;
+}
+
+.agreement input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    margin-top:2px;
+    accent-color: var(--accent);
+    flex-shrink:0;
+}
+
+.agreement label{
+    line-height:1.4;
+    cursor:pointer;
+}
+
+.btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    box-shadow:none;
+}
+
+.footer{text-align:center; margin-bottom: 10px; padding:30px 10px;color:#6f89a0;font-size:.8rem}
+.footer a{color:#6f89a0;margin:0 8px;text-decoration:none}
+
+#thanksSheet{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translate(-50%,100%);
+  max-width:430px;
+  width:100%;
+  background:#091220;
+  padding:20px;
+  border-radius:24px 24px 0 0;
+  transition:.3s;
+  z-index:100;
+}
+
+#thanksSheet.open{
+  transform:translate(-50%,0);
+}
+
+#thanksOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  opacity:0;
+  visibility:hidden;
+  transition:.3s;
+  z-index:90;
+}
+
+#thanksOverlay.show{
+  opacity:1;
+  visibility:visible;
+}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay"></div>
+
+<div class="app">
+<div class="header">
+<div class="logo"><span class="glow"></span>Game Shop</div>
+</div>
+
+<section id="home" class="page active">
+<div class="hero">
+<div class="orb"></div>
+<div class="title">ИГРОВОЙ МАГАЗИН<br><span class="glow">ДЫРЯВОГО МОРТИРЩИКА</span></div>
+<p class="small">ИГРОВАЯ ВАЛЮТА • МГНОВЕННАЯ ДОСТАВКА</p>
+</div>
+<div class="ticker"><div class="track">БУДУЩИЕ ОТЗЫВЫ ПОКУПАТЕЛЕЙ </div></div>
+<h4 style="margin-top:18px" class="glow">ВЫБЕРИ ИГРУ</h4>
+<div class="card" onclick="openGame()">
+<img src="Clash_Royale_logo.png" alt="game">
+<h2>Clash Royale</h2>
+<div class="small">Royale Pass, монеты, гемы, другие акции</div>
+</div>
+</section>
+
+<section id="game" class="page">
+<div onclick="showPage('home')" style="margin-bottom:14px; cursor: pointer;">← BACK</div>
+<h1>Clash Royale</h1>
+<div class="card" onclick="openPackages('Royale Pass')"><h3>Royale Pass</h3><p class="small">Боевой пропуск с кучей наград!</p></div>
+<div class="card" onclick="openPackages('Фестиваль Карт-Джокеров')"><h3>Фестиваль Карт-Джокеров</h3><p class="small">Прокачай свою колоду картами-джокерами!</p></div>
+<div class="card" onclick="openPackages('Легендарный Путь')"><h3>Легендарный Путь</h3><p class="small">Получи большое количество легендарных карт-джокеров!</p></div>
+<div class="card" onclick="openPackages('Рынок Эволюций')"><h3>Рынок Эволюций</h3><p class="small">Прокачай свою колоды с помощью эволюции!</p></div>
+<div class="card" onclick="openPackages('Рынок Героев')"><h3>Рынок Героев</h3><p class="small">Прокачай свою колоды с помощью героев!</p></div>
+<div class="card" onclick="openPackages('Рынок Легендарных Карт')"><h3>Рынок Легендарных Карт</h3><p class="small">Прокача свою любимую легендарную карту!</p></div>
+<div class="card" onclick="openPackages('Рынок Карт Чемпионов')"><h3>Рынок Карт Чемпионов</h3><p class="small">Прокача свою любимую чемпионскую карту!</p></div>
+<div class="card" onclick="openPackages('Рынок Эмодзи')"><h3>Рынок Эмодзи</h3><p class="small">Покажи сопернику свою крутость!</p></div>
+<div class="card" onclick="openPackages('Баланс Аккаунта')"><h3>Золото и Гемы</h3><p class="small">Пополни свой игровой аккаунт золотом и гемами!</p></div>
+</section>
+
+<section id="packages" class="page">
+<div onclick="showPage('game')" style="margin-bottom:14px; cursor: pointer;">← BACK</div>
+<h2 id="pkgTitle">Packages</h2>
+<div id="pkgList"></div>
+</section>
+
+<div class="bottomBar" id="bar">
+<div><div class="small">Selected</div><div id="price" class="mono">$0.00</div></div>
+<button class="btn" onclick="openCheckout()">BUY</button>
+</div>
+
+<div class="sheet" id="sheet">
+<div class="sheetHandle"></div>
+<h3>Checkout</h3>
+<p id="summary"></p>
+<input id="gameId" placeholder="Game ID">
+<input id="username" placeholder="Telegram @username">
+<div class="agreement">
+    <input type="checkbox" id="agree">
+    <label for="agree">
+        Я подтверждаю, что на моём аккаунте доступна выбранная акция и понимаю, что в противном случае заказ не может быть выполнен.
+    </label>
+</div>
+
+<button
+    id="buyBtn"
+    class="btn"
+    style="width:100%;margin-top:10px"
+    disabled>
+    Купить
+</button>
+</div>
+
+<section id="payment" class="page">
+<div onclick="showPage('home')" style="margin-bottom:14px;cursor:pointer">← BACK</div>
+<h1>Оплата</h1>
+<div class="card">
+    <h3 id="paymentProduct">Товар</h3>
+    <div class="mono" id="paymentPrice">$0.00</div>
+</div>
+<div class="card">
+    <h3>Переведите оплату</h3>
+    <p style="margin-top:10px">Евро:</p>
+    <div class="mono">1234 5678 9012 3456</div>
+    <br>
+    <p>Гривны:</p>
+    <div class="mono">1234 5678 9012 3456</div>
+</div>
+<button class="btn" id="paidBtn" style="width:100%;margin-top:20px" onclick="paid()">✅ Я оплатил</button>
+<button class="btn" id="confirmBtn" style="width:100%;margin-top:10px; display:none; background:#00ff88; color:#000" onclick="sendOrder()">📤 Подтвердить заказ</button>
+<p id="confirmHint" style="display:none; color:#aaa; font-size:0.9em; margin-top:5px; text-align:center;">После нажатия откроется чат с ботом — нажмите «Отправить»</p>
+<button class="btn" style="width:100%;margin-top:10px;background:#444;color:white" onclick="showPage('home')">❌ Я передумал</button>
+</section>
+
+<div class="footer">
+<a href="https://t.me/Leaky_admin">ПОДДЕРЖКА</a>
+</div>
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+// Данные сохраняем перед переходом на оплату
+window.savedGameId = '';
+window.savedUsername = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const gameIdInput = document.getElementById('gameId');
+  const usernameInput = document.getElementById('username');
+  const agree = document.getElementById('agree');
+  const buyBtn = document.getElementById('buyBtn');
+
+  function checkForm() {
+    buyBtn.disabled = !(
+      gameIdInput.value.trim() &&
+      usernameInput.value.trim() &&
+      agree.checked
+    );
+  }
+
+  gameIdInput.addEventListener('input', checkForm);
+  usernameInput.addEventListener('input', checkForm);
+  agree.addEventListener('change', checkForm);
+});
+
+const categories = {
+  "Royale Pass": [
+    { name: "Royale Pass", price: 15, hot: true }
+  ],
+  "Баланс Аккаунта": [
+    { name: "100 000 Золота", price: 2.49 },
+    { name: "250 000 Золота", price: 5.99 },
+    { name: "80 Гемов", price: 1.19 },
+    { name: "500 Гемов", price: 5.99 },
+    { name: "1200 Гемов", price: 11.99 },
+    { name: "2500 Гемов", price: 23.99 },
+    { name: "6500 Гемов", price: 59.99 },
+    { name: "14000 Гемов", price: 119.99 },
+  ],
+  "Фестиваль Карт-Джокеров": [
+    { name: "x1500 Обычных", price: 2.50 },
+    { name: "х300 Редких + х1500 Обычных", price: 5 },
+    { name: "х40 Эпических + х300 Редких + х1500 Обычных", price: 7.50 },
+    { name: "Вся цепочка", price: 10.00 },
+  ],
+  "Легендарный Путь": [
+    { name: "x3 Джокера", price: 2.50 },
+    { name: "х3 + х4 Джокеров", price: 5 },
+    { name: "х3 + х4 + х6 Джокеров", price: 7.50 },
+    { name: "Вся цепочка", price: 10.00 },
+  ],
+  "Рынок Эволюций": [
+    { name: "x3 Осколка эволюции на выбор", price: 7.00 },
+    { name: "x6 Осколков эволюции на выбор", price: 14.00 },
+  ],
+  "Рынок Героев": [
+    { name: "Герой на ваш выбор", price: 15.00 },
+  ],
+  "Рынок Легендарных Карт": [
+    { name: "х8 Легендарных карт на ваш выбор <br> (Максимум 5 покупок одного типа)", price: 10.00 },
+  ],
+  "Рынок Карт Чемпионов": [
+    { name: "х5 Чемпионских карт на ваш выбор <br> (Максимум 6 покупок одного типа)", price: 12.00 },
+  ],
+  "Рынок Эмодзи": [
+    { name: "Любой эмодзи на ваш выбор", price: 6.00 },
+  ],
+};
+
+let currentCategory = null;
+let selected = null;
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id !== 'packages') {
+    bar.classList.remove('show');
+    sheet.classList.remove('open');
+  }
+}
+
+function selectPackage(i, el){
+  const item = categories[currentCategory][i];
+  if (selected === item) {
+    clearSelection();
+    return;
+  }
+  document.querySelectorAll('#pkgList .card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = item;
+  bar.classList.add('show');
+  price.textContent = '$' + item.price.toFixed(2);
+  summary.textContent = item.name + ' - $' + item.price.toFixed(2);
+}
+
+function clearSelection(){
+  selected = null;
+  document.querySelectorAll('#pkgList .card').forEach(c => c.classList.remove('selected'));
+  bar.classList.remove('show');
+}
+
+document.addEventListener('click', (e) => {
+  const isCard = e.target.closest('#pkgList .card');
+  const isBar = e.target.closest('#bar');
+  const isSheet = e.target.closest('#sheet');
+  if (!isCard && !isBar && !isSheet) {
+    bar.classList.remove('show');
+    sheet.classList.remove('open');
+    overlay.classList.remove('show');
+  }
+});
+
+function openGame(){showPage('game')}
+function openPackages(title){
+  currentCategory = title;
+  showPage('packages');
+  pkgTitle.textContent = title;
+  pkgList.innerHTML = '';
+  categories[title].forEach((p, i) => {
+    let el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `<h3>${p.name} ${p.hot ? '<span class="badge">HOT</span>' : ''}</h3><div class="mono">$${p.price.toFixed(2)}</div>`;
+    el.onclick = () => selectPackage(i, el);
+    pkgList.appendChild(el);
+  });
+}
+
+overlay.addEventListener('click', () => {
+  sheet.classList.remove('open');
+  overlay.classList.remove('show');
+  if(selected) bar.classList.add('show');
+});
+
+function goToPayment(){
+    if (!selected) {
+        alert("Сначала выбери товар");
+        return;
+    }
+    document.getElementById('paymentProduct').innerHTML = selected.name;
+    document.getElementById('paymentPrice').textContent = '$' + selected.price.toFixed(2);
+    sheet.classList.remove('open');
+    overlay.classList.remove('show');
+    showPage('payment');
+}
+
+function openCheckout() {
+  bar.classList.remove('show');
+  setTimeout(() => {
+    sheet.classList.add('open');
+    overlay.classList.add('show');
+  }, 300);
+}
+
+// Свайп для закрытия шторки (жесты)
+const handle = document.querySelector('.sheetHandle');
+let startY = 0;
+let currentY = 0;
+
+handle.addEventListener('touchstart', e => {
+  startY = e.touches[0].clientY;
+  sheet.style.transition = 'none';
+});
+handle.addEventListener('touchmove', e => {
+  currentY = e.touches[0].clientY;
+  const diff = Math.max(0, currentY - startY);
+  sheet.style.transform = `translate(-50%, ${diff}px)`;
+});
+handle.addEventListener('touchend', e => {
+  sheet.style.transition = 'transform .25s ease';
+  const diff = currentY - startY;
+  if(diff > 120){
+    sheet.classList.remove('open');
+    overlay.classList.remove('show');
+    if(selected) bar.classList.add('show');
+  }else{
+    sheet.style.transform = 'translate(-50%, 0)';
+  }
+});
+
+const agree = document.getElementById('agree');
+const buyBtn = document.getElementById('buyBtn');
+
+buyBtn.addEventListener('click', () => {
+  if (!selected) {
+    alert("Ты не выбрал товар");
+    return;
+  }
+  // Сохраняем данные
+  window.savedGameId = document.getElementById('gameId').value.trim();
+  window.savedUsername = document.getElementById('username').value.trim();
+  goToPayment();
+});
+
+// ========== ФУНКЦИЯ ОТПРАВКИ ЗАКАЗА ==========
+function paid() {
+  if (!selected || typeof selected !== "object") {
+    alert("Ошибка: товар не выбран");
+    return;
+  }
+  
+  // Скрываем кнопку "Я оплатил"
+  document.getElementById('paidBtn').style.display = 'none';
+  
+  // Показываем кнопку "Подтвердить заказ" и подсказку
+  document.getElementById('confirmBtn').style.display = 'block';
+  document.getElementById('confirmHint').style.display = 'block';
+}
+function sendOrder() {
+  const gameId = window.savedGameId || "не указан";
+  const username = window.savedUsername || "не указан";
+
+  const orderText = `НОВЫЙ ЗАКАЗ%0A%0A🎮 Товар: ${selected.name}%0A💰 Цена: $${selected.price}%0A🆔 Game ID: ${gameId}%0A👤 Username: @${username}`;
+  const url = `https://t.me/leaky_mortarShopBot?text=${orderText}`;
+
+  if (window.Telegram?.WebApp) {
+    // Сначала открываем ссылку, потом закрываем WebApp с небольшой задержкой
+    Telegram.WebApp.openTelegramLink(url);
+    setTimeout(() => {
+      Telegram.WebApp.close();
+    }, 500);
+  } else {
+    alert("Откройте магазин через Telegram!");
+    return;
+  }
+
+  // Прячем кнопки
+  document.getElementById('confirmBtn').style.display = 'none';
+  document.getElementById('confirmHint').style.display = 'none';
+  document.getElementById('paidBtn').style.display = 'none';
+}
+
+function closeThanks(){
+  thanksSheet.classList.remove('open');
+  thanksOverlay.classList.remove('show');
+  showPage('home');
+}
+</script>
+</body>
+</html>
