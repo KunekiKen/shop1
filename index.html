@@ -179,6 +179,14 @@ input{width:100%;margin:8px 0;padding:12px;background:#05080E;border:1px solid #
   opacity:1;
   visibility:visible;
 }
+
+/* Убираем синее выделение при касании на всех кнопках */
+button, .btn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 </style>
 </head>
 <body>
@@ -527,11 +535,22 @@ function copyOrderText() {
 }
 
 function openBotChat() {
+  const url = 'https://t.me/leaky_mortarShopBot';
+  // Способ 1: Telegram API
   if (window.Telegram?.WebApp) {
-    Telegram.WebApp.openTelegramLink('https://t.me/leaky_mortarShopBot');
-  } else {
-    window.open('https://t.me/leaky_mortarShopBot', '_blank');
+    try {
+      Telegram.WebApp.openTelegramLink(url);
+      return;
+    } catch(e) {}
   }
+  // Способ 2: создаём элемент <a> и кликаем
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function finishOrder() {
