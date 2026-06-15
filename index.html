@@ -282,10 +282,15 @@ button, .btn {
 <div onclick="showPage('home')" style="margin-bottom:14px;cursor:pointer">← BACK</div>
 <h1>📋 Ваш заказ</h1>
 <div class="card" style="text-align:center;">
-    <p style="margin-bottom:10px;">Скопируйте текст заказа, откройте чат с ботом, вставьте и отправьте.</p>
+    <p style="margin-bottom:10px; font-size:0.95em;">
+        <b>1.</b> Нажмите «Скопировать текст»<br>
+        <b>2.</b> Закройте магазин и откройте чат с ботом<br>
+        <b>3.</b> Вставьте текст и отправьте
+    </p>
     <pre id="orderText" style="background:#05080E;padding:15px;border-radius:12px;text-align:left;white-space:pre-wrap;word-wrap:break-word;color:#fff;"></pre>
     <button class="btn" style="width:100%;margin-top:10px;" onclick="copyOrderText()">📋 Скопировать текст</button>
-    <button class="btn" style="width:100%;margin-top:10px; background:#444; color:white;" onclick="openBotChat()">💬 Открыть чат с ботом</button>
+    <button class="btn" style="width:100%;margin-top:10px; background:#ff4444; color:white;" onclick="closeWebApp()">🚪 Закрыть магазин</button>
+    <p style="font-size:0.8em; color:#aaa; margin-top:10px;">После закрытия откройте чат @leaky_mortarShopBot, вставьте текст и отправьте.</p>
 </div>
 </section>
 
@@ -534,31 +539,37 @@ function copyOrderText() {
   }
 }
 
-function openBotChat() {
-  const url = 'https://t.me/leaky_mortarShopBot';
-  // Способ 1: Telegram API
-  if (window.Telegram?.WebApp) {
-    try {
-      Telegram.WebApp.openTelegramLink(url);
-      return;
-    } catch(e) {}
+function copyOrderText() {
+  const text = document.getElementById('orderText').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('✅ Текст скопирован!'))
+      .catch(() => {
+        // Fallback для старых браузеров
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('✅ Текст скопирован!');
+      });
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('✅ Текст скопирован!');
   }
-  // Способ 2: создаём элемент <a> и кликаем
-  const a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
 }
 
-function finishOrder() {
-  alert('Спасибо! Администратор скоро свяжется с вами.');
-  showPage('home');
-  // Можно также закрыть WebApp:
+function closeWebApp() {
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.close();
+  } else {
+    alert('Закройте это окно и откройте чат с ботом вручную.');
   }
 }
 </script>
