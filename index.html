@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:#fff;font-family:Inter,sans-serif}
 .app{max-width:430px;margin:auto;min-height:100vh;background:linear-gradient(#040812,#05080E)}
-.header{position:sticky;top:0;display:flex;justify-content:space-between;padding:16px;background:rgba(5,8,14,.95);border-bottom:1px solid #10253a}
+.header{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:16px;background:rgba(5,8,14,.95);border-bottom:1px solid #10253a;z-index:10}
 .logo{font-weight:800;letter-spacing:2px}
 .glow{color:var(--accent);text-shadow:0 0 12px var(--accent)}
 .page{display:none;padding:16px}
@@ -114,7 +114,8 @@ transition: transform .25s ease;
   visibility:visible;
 }
 .sheet.open{transform:translate(-50%,0)}
-input{width:100%;margin:8px 0;padding:12px;background:#05080E;border:1px solid #123;color:#fff;border-radius:10px}
+input, textarea{width:100%;margin:8px 0;padding:12px;background:#05080E;border:1px solid #123;color:#fff;border-radius:10px;font-family:Inter,sans-serif}
+textarea{resize:vertical;min-height:80px}
 
 .agreement{
     display:flex;
@@ -180,12 +181,23 @@ input{width:100%;margin:8px 0;padding:12px;background:#05080E;border:1px solid #
   visibility:visible;
 }
 
-/* Убираем синее выделение при касании на всех кнопках */
 button, .btn {
   -webkit-tap-highlight-color: transparent;
   outline: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* единый стиль для кнопок BACK и МЕНЮ */
+.nav-link {
+  cursor: pointer;
+  color: #6f89a0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: #fff;
 }
 </style>
 </head>
@@ -210,10 +222,18 @@ button, .btn {
 <h2>Clash Royale</h2>
 <div class="small">Royale Pass, монеты, гемы, другие акции</div>
 </div>
+<div class="card" onclick="openServices()">
+<img src="Logo1.jpg" alt="services">
+<h2>Услуги</h2>
+<div class="small">1 на 1, оценка колоды, донат</div>
+</div>
 </section>
 
 <section id="game" class="page">
-<div onclick="showPage('home')" style="margin-bottom:14px; cursor: pointer;">← BACK</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+  <span class="nav-link" onclick="goBack()">← BACK</span>
+  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+</div>
 <h1>Clash Royale</h1>
 <div class="card" onclick="openPackages('Royale Pass')"><h3>Royale Pass</h3><p class="small">Боевой пропуск с кучей наград!</p></div>
 <div class="card" onclick="openPackages('Фестиваль Карт-Джокеров')"><h3>Фестиваль Карт-Джокеров</h3><p class="small">Прокачай свою колоду картами-джокерами!</p></div>
@@ -227,8 +247,23 @@ button, .btn {
 <div class="card" onclick="openPackages('Баланс Аккаунта')"><h3>Золото и Гемы</h3><p class="small">Пополни свой игровой аккаунт золотом и гемами!</p></div>
 </section>
 
+<section id="services" class="page">
+<div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+  <span class="nav-link" onclick="goBack()">← BACK</span>
+  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+</div>
+<h1>Услуги</h1>
+<div class="card" onclick="openPackages('1 на 1')"><h3>Игра 1 на 1</h3><p class="small">Проверь свой скил против Мортирщика!</p></div>
+<div class="card" onclick="openPackages('Оценка колоды (Стрим)')"><h3>Оценка колоды (Стрим)</h3><p class="small">Разбор колоды в прямом эфире!</p></div>
+<div class="card" onclick="openPackages('Оценка колоды (Приоритет)')"><h3>Оценка колоды (Приоритет)</h3><p class="small">Ускоренный разбор колоды!</p></div>
+<div class="card" onclick="openPackages('Донат')"><h3>Донат-поддержка автора</h3><p class="small">Поддержи канал!</p></div>
+</section>
+
 <section id="packages" class="page">
-<div onclick="showPage('game')" style="margin-bottom:14px; cursor: pointer;">← BACK</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+  <span class="nav-link" onclick="goBack()">← BACK</span>
+  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+</div>
 <h2 id="pkgTitle">Packages</h2>
 <div id="pkgList"></div>
 </section>
@@ -242,26 +277,15 @@ button, .btn {
 <div class="sheetHandle"></div>
 <h3>Checkout</h3>
 <p id="summary"></p>
-<input id="gameId" placeholder="Game ID">
-<input id="username" placeholder="Telegram @username">
-<div class="agreement">
-    <input type="checkbox" id="agree">
-    <label for="agree">
-        Я подтверждаю, что на моём аккаунте доступна выбранная акция и понимаю, что в противном случае заказ не может быть выполнен.
-    </label>
-</div>
-
-<button
-    id="buyBtn"
-    class="btn"
-    style="width:100%;margin-top:10px"
-    disabled>
-    Купить
-</button>
+<div id="dynamicFields"></div>
+<button id="buyBtn" class="btn" style="width:100%;margin-top:10px" disabled>Купить</button>
 </div>
 
 <section id="payment" class="page">
-<div onclick="showPage('home')" style="margin-bottom:14px;cursor:pointer">← BACK</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+  <span class="nav-link" onclick="goBack()">← BACK</span>
+  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+</div>
 <h1>Оплата</h1>
 <div class="card">
     <h3 id="paymentProduct">Товар</h3>
@@ -275,18 +299,23 @@ button, .btn {
     <p>Гривны:</p>
     <div class="mono">4441 1144 6662 8748</div>
 </div>
+<p id="screenshotHint" style="color:#ffaa00; margin-top:10px; display:none;">⚠️ Обязательно сделайте скриншот оплаты – его нужно будет прикрепить к сообщению с заказом!</p>
 <button class="btn" id="paidBtn" style="width:100%;margin-top:20px" onclick="paid()">✅ Я оплатил</button>
-<button class="btn" style="width:100%;margin-top:10px;background:#444;color:white" onclick="showPage('home')">❌ Я передумал</button>
+<button class="btn" style="width:100%;margin-top:10px;background:#444;color:white" onclick="goBack()">❌ Я передумал</button>
 </section>
 
 <section id="finalOrder" class="page">
-<div onclick="showPage('home')" style="margin-bottom:14px;cursor:pointer">← BACK</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+  <span class="nav-link" onclick="goBack()">← BACK</span>
+  <span class="nav-link" onclick="goHome()">MENU</span>
+</div>
 <h1>📋 Ваш заказ</h1>
 <div class="card" style="text-align:center;">
     <p style="margin-bottom:10px; font-size:0.95em;">
         <b>1.</b> Нажмите «Скопировать текст»<br>
         <b>2.</b> Закройте магазин и откройте чат с ботом<br>
-        <b>3.</b> Вставьте текст и отправьте
+        <b>3.</b> Вставьте текст и отправьте<br>
+        <span id="screenshotReminder" style="color:#ffaa00;"></span>
     </p>
     <pre id="orderText" style="background:#05080E;padding:15px;border-radius:12px;text-align:left;white-space:pre-wrap;word-wrap:break-word;color:#fff;"></pre>
     <button class="btn" style="width:100%;margin-top:10px;" onclick="copyOrderText()">📋 Скопировать текст</button>
@@ -307,28 +336,47 @@ tg.expand();
 
 window.savedGameId = '';
 window.savedUsername = '';
+window.serviceData = {};
+window.currentServiceConfig = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const gameIdInput = document.getElementById('gameId');
-  const usernameInput = document.getElementById('username');
-  const agree = document.getElementById('agree');
-  const buyBtn = document.getElementById('buyBtn');
+// История переходов
+let pageHistory = [];
 
-  function checkForm() {
-    buyBtn.disabled = !(
-      gameIdInput.value.trim() &&
-      usernameInput.value.trim() &&
-      agree.checked
-    );
+function goHome() {
+  pageHistory = [];
+  showPageDirect('home');
+}
+
+function goBack() {
+  if (pageHistory.length > 0) {
+    const prev = pageHistory.pop();
+    showPageDirect(prev);
+  } else {
+    goHome();
   }
+}
 
-  gameIdInput.addEventListener('input', checkForm);
-  usernameInput.addEventListener('input', checkForm);
-  agree.addEventListener('change', checkForm);
-});
+function showPageDirect(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const page = document.getElementById(id);
+  if (page) page.classList.add('active');
+  if (id !== 'packages') {
+    bar.classList.remove('show');
+    sheet.classList.remove('open');
+  }
+}
 
-// ========== ЦЕНЫ: МЕНЯТЬ ТОЛЬКО ЗДЕСЬ ==========
+function showPage(id){
+  const currentActive = document.querySelector('.page.active');
+  if (currentActive && currentActive.id !== id) {
+    pageHistory.push(currentActive.id);
+  }
+  showPageDirect(id);
+}
+
+// ========== ЦЕНЫ И КАТЕГОРИИ ==========
 const categories = {
+  // --- Clash Royale ---
   "Royale Pass": [
     { name: "Royale Pass", eur: 15, uah: 610, hot: true }
   ],
@@ -353,7 +401,7 @@ const categories = {
     { name: "х3 + х4 + х6 Джокеров", eur: 15.5, uah: 775 },
     { name: "х3 + х4 + х6 + х8 Джокеров <br> (Вся цепочка)", eur: 25.5, uah: 1275 },
   ],
-  "Королевская сделка": [
+  "Королевская Сделка": [
     { name: "x2 Джокера", eur: 4, uah: 200 },
     { name: "х2 + х4 Джокеров", eur: 12, uah: 600 },
     { name: "х2 + х4 + х6 Джокеров <br> (Вся цепочка)", eur: 24, uah: 1210 },
@@ -374,6 +422,46 @@ const categories = {
   "Рынок Эмодзи": [
     { name: "Любой эмодзи на ваш выбор", eur: 5, uah: 250 },
   ],
+
+  // --- Услуги ---
+  "1 на 1": [
+    { name: "Игра 1 на 1", eur: 1, uah: 50, serviceType: "onetoone",
+      fields: [
+        { id: "ingameNick", placeholder: "Ник в игре", label: "Ник в игре" },
+        { id: "ingameId", placeholder: "ID игрока", label: "ID игрока" }
+      ],
+      agreementText: "Я подтверждаю, что ввел правильные никнейм и ID.",
+      requireScreenshot: true
+    }
+  ],
+  "Оценка колоды (Стрим)": [
+    { name: "Оценка колоды на стриме", eur: 1, uah: 50, serviceType: "deckreview",
+      fields: [
+        { id: "deckDescription", placeholder: "Опишите свою колоду...", label: "Ваша колода", big: true }
+      ],
+      agreementText: "Я подтверждаю, что правильно описал свою колоду.",
+      requireScreenshot: true
+    }
+  ],
+  "Оценка колоды (Приоритет)": [
+    { name: "Приоритетная оценка колоды", eur: 1, uah: 50, serviceType: "deckreview",
+      fields: [
+        { id: "deckDescription", placeholder: "Опишите свою колоду...", label: "Ваша колода", big: true }
+      ],
+      agreementText: "Я подтверждаю, что правильно описал свою колоду.",
+      requireScreenshot: true
+    }
+  ],
+  "Донат": [
+    { name: "Донат-поддержка автора", eur: 1, uah: 50, serviceType: "donate",
+      fields: [
+        { id: "wishes", placeholder: "Пожелания (необязательно)...", label: "Пожелания", big: true }
+      ],
+      agreementText: null,
+      requireScreenshot: false,
+      buttonText: "Продолжить"
+    }
+  ]
 };
 
 let currentCategory = null;
@@ -381,15 +469,6 @@ let selected = null;
 
 function formatPrice(item) {
   return `€${item.eur} / ${item.uah}₴`;
-}
-
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if (id !== 'packages') {
-    bar.classList.remove('show');
-    sheet.classList.remove('open');
-  }
 }
 
 function selectPackage(i, el){
@@ -424,12 +503,23 @@ document.addEventListener('click', (e) => {
 });
 
 function openGame(){showPage('game')}
+function openServices(){showPage('services')}
 function openPackages(title){
   currentCategory = title;
+  const items = categories[title];
+  if (!items) return;
+
+  const firstItem = items[0];
+  if (firstItem && firstItem.serviceType) {
+    window.currentServiceConfig = firstItem;
+  } else {
+    window.currentServiceConfig = null;
+  }
+
   showPage('packages');
   pkgTitle.textContent = title;
   pkgList.innerHTML = '';
-  categories[title].forEach((p, i) => {
+  items.forEach((p, i) => {
     let el = document.createElement('div');
     el.className = 'card';
     el.innerHTML = `<h3>${p.name} ${p.hot ? '<span class="badge">HOT</span>' : ''}</h3><div class="mono">${formatPrice(p)}</div>`;
@@ -451,23 +541,202 @@ function goToPayment(){
     }
     document.getElementById('paymentProduct').innerHTML = selected.name;
     document.getElementById('paymentPrice').textContent = formatPrice(selected);
+    
+    const hint = document.getElementById('screenshotHint');
+    if (selected.requireScreenshot) {
+      hint.style.display = 'block';
+    } else {
+      hint.style.display = 'none';
+    }
+
     sheet.classList.remove('open');
     overlay.classList.remove('show');
     showPage('payment');
 }
 
 function openCheckout() {
+  if (!selected) return;
   bar.classList.remove('show');
+
+  const container = document.getElementById('dynamicFields');
+  container.innerHTML = '';
+
+  const config = window.currentServiceConfig;
+  const buyBtn = document.getElementById('buyBtn');
+
+  if (config && config.fields) {
+    config.fields.forEach((field, idx) => {
+      const el = field.big ? document.createElement('textarea') : document.createElement('input');
+      el.id = `field_${idx}`;
+      el.placeholder = field.placeholder;
+      if (field.big) el.style.minHeight = '100px';
+      container.appendChild(el);
+    });
+
+    if (config.agreementText) {
+      const agreeDiv = document.createElement('div');
+      agreeDiv.className = 'agreement';
+      agreeDiv.innerHTML = `
+        <input type="checkbox" id="agree">
+        <label for="agree">${config.agreementText}</label>
+      `;
+      container.appendChild(agreeDiv);
+    }
+
+    buyBtn.textContent = config.buttonText || 'Купить';
+    buyBtn.disabled = true;
+  } else {
+    container.innerHTML = `
+      <input id="gameId" placeholder="Game ID">
+      <input id="username" placeholder="Telegram @username">
+      <div class="agreement">
+        <input type="checkbox" id="agree">
+        <label for="agree">Я подтверждаю, что на моём аккаунте доступна выбранная акция и понимаю, что в противном случае заказ не может быть выполнен.</label>
+      </div>
+    `;
+    buyBtn.textContent = 'Купить';
+    buyBtn.disabled = true;
+  }
+
+  setupFormValidation();
+
   setTimeout(() => {
     sheet.classList.add('open');
     overlay.classList.add('show');
   }, 300);
 }
 
+function setupFormValidation() {
+  const buyBtn = document.getElementById('buyBtn');
+  const config = window.currentServiceConfig;
+
+  const check = () => {
+    if (config && config.fields) {
+      let allFilled = true;
+      if (config.serviceType !== 'donate') {
+        config.fields.forEach((_, idx) => {
+          const el = document.getElementById(`field_${idx}`);
+          if (el && el.value.trim() === '') allFilled = false;
+        });
+      } else {
+        allFilled = true;
+      }
+      const agreeCheckbox = document.getElementById('agree');
+      if (agreeCheckbox && !agreeCheckbox.checked) allFilled = false;
+      buyBtn.disabled = !allFilled;
+    } else {
+      const gameId = document.getElementById('gameId')?.value.trim();
+      const username = document.getElementById('username')?.value.trim();
+      const agree = document.getElementById('agree')?.checked;
+      buyBtn.disabled = !(gameId && username && agree);
+    }
+  };
+
+  document.querySelectorAll('#dynamicFields input, #dynamicFields textarea').forEach(el => {
+    el.addEventListener('input', check);
+  });
+  const agreeCheckbox = document.getElementById('agree');
+  if (agreeCheckbox) agreeCheckbox.addEventListener('change', check);
+
+  check();
+}
+
+document.getElementById('buyBtn').addEventListener('click', () => {
+  if (!selected) {
+    alert("Ты не выбрал товар");
+    return;
+  }
+
+  const config = window.currentServiceConfig;
+  if (config && config.fields) {
+    const data = {};
+    config.fields.forEach((field, idx) => {
+      const el = document.getElementById(`field_${idx}`);
+      if (el) data[field.id] = el.value.trim();
+    });
+    window.serviceData = data;
+  } else {
+    window.savedGameId = document.getElementById('gameId')?.value.trim() || '';
+    window.savedUsername = document.getElementById('username')?.value.trim() || '';
+  }
+
+  goToPayment();
+});
+
+function paid() {
+  if (!selected || typeof selected !== "object") {
+    alert("Ошибка: товар не выбран");
+    return;
+  }
+  document.getElementById('paidBtn').style.display = 'none';
+
+  let orderText = '';
+  const config = window.currentServiceConfig;
+  if (config && config.serviceType) {
+    orderText = `ЗАКАЗ УСЛУГИ\n\n🎮 Услуга: ${selected.name}\n💰 Цена: ${formatPrice(selected)}`;
+    if (config.fields) {
+      config.fields.forEach(field => {
+        const val = window.serviceData[field.id] || '';
+        if (val) orderText += `\n📌 ${field.label}: ${val}`;
+      });
+    }
+    if (selected.requireScreenshot) {
+      orderText += `\n\n⚠️ Пожалуйста, прикрепите скриншот оплаты к этому сообщению.`;
+    }
+  } else {
+    const gameId = window.savedGameId || "не указан";
+    const username = window.savedUsername || "не указан";
+    orderText = `НОВЫЙ ЗАКАЗ\n\n🎮 Товар: ${selected.name}\n💰 Цена: ${formatPrice(selected)}\n🆔 Game ID: ${gameId}\n👤 Username: @${username}`;
+    if (selected.requireScreenshot !== false) {
+      orderText += `\n\n⚠️ Пожалуйста, прикрепите скриншот оплаты к этому сообщению.`;
+    }
+  }
+
+  document.getElementById('orderText').textContent = orderText;
+  
+  const reminder = document.getElementById('screenshotReminder');
+  if (selected.requireScreenshot) {
+    reminder.textContent = '📎 Не забудьте прикрепить скриншот оплаты!';
+  } else {
+    reminder.textContent = '';
+  }
+
+  showPage('finalOrder');
+}
+
+function copyOrderText() {
+  const text = document.getElementById('orderText').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('✅ Текст скопирован!'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  alert('✅ Текст скопирован!');
+}
+
+function closeWebApp() {
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.close();
+  } else {
+    alert('Закройте это окно и откройте чат с ботом вручную.');
+  }
+}
+
+// Свайп для закрытия шторки (жесты)
 const handle = document.querySelector('.sheetHandle');
 let startY = 0;
 let currentY = 0;
-
 handle.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
   sheet.style.transition = 'none';
@@ -488,73 +757,6 @@ handle.addEventListener('touchend', e => {
     sheet.style.transform = 'translate(-50%, 0)';
   }
 });
-
-const agree = document.getElementById('agree');
-const buyBtn = document.getElementById('buyBtn');
-
-buyBtn.addEventListener('click', () => {
-  if (!selected) {
-    alert("Ты не выбрал товар");
-    return;
-  }
-  window.savedGameId = document.getElementById('gameId').value.trim();
-  window.savedUsername = document.getElementById('username').value.trim();
-  goToPayment();
-});
-
-function paid() {
-  if (!selected || typeof selected !== "object") {
-    alert("Ошибка: товар не выбран");
-    return;
-  }
-  document.getElementById('paidBtn').style.display = 'none';
-
-  const gameId = window.savedGameId || "не указан";
-  const username = window.savedUsername || "не указан";
-
-  const orderText = `НОВЫЙ ЗАКАЗ
-
-🎮 Товар: ${selected.name}
-💰 Цена: ${formatPrice(selected)}
-🆔 Game ID: ${gameId}
-👤 Username: ${username}`;
-
-  document.getElementById('orderText').textContent = orderText;
-  showPage('finalOrder');
-}
-
-function copyOrderText() {
-  const text = document.getElementById('orderText').textContent;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => alert('✅ Текст скопирован!'))
-      .catch(() => {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('✅ Текст скопирован!');
-      });
-  } else {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('✅ Текст скопирован!');
-  }
-}
-
-function closeWebApp() {
-  if (window.Telegram?.WebApp) {
-    Telegram.WebApp.close();
-  } else {
-    alert('Закройте это окно и откройте чат с ботом вручную.');
-  }
-}
 </script>
 </body>
 </html>
