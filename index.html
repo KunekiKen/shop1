@@ -218,6 +218,7 @@ button, .btn {
 <div class="card" onclick="openPackages('Royale Pass')"><h3>Royale Pass</h3><p class="small">Боевой пропуск с кучей наград!</p></div>
 <div class="card" onclick="openPackages('Фестиваль Карт-Джокеров')"><h3>Фестиваль Карт-Джокеров</h3><p class="small">Прокачай свою колоду картами-джокерами!</p></div>
 <div class="card" onclick="openPackages('Легендарный Путь')"><h3>Легендарный Путь</h3><p class="small">Получи большое количество легендарных карт-джокеров!</p></div>
+<div class="card" onclick="openPackages('Королевская Сделка')"><h3>Королевская Сделка</h3><p class="small">Получи большое количество чемпионских карт-джокеров!</p></div>
 <div class="card" onclick="openPackages('Рынок Эволюций')"><h3>Рынок Эволюций</h3><p class="small">Прокачай свою колоды с помощью эволюции!</p></div>
 <div class="card" onclick="openPackages('Рынок Героев')"><h3>Рынок Героев</h3><p class="small">Прокачай свою колоды с помощью героев!</p></div>
 <div class="card" onclick="openPackages('Рынок Легендарных Карт')"><h3>Рынок Легендарных Карт</h3><p class="small">Прокача свою любимую легендарную карту!</p></div>
@@ -233,7 +234,7 @@ button, .btn {
 </section>
 
 <div class="bottomBar" id="bar">
-<div><div class="small">Selected</div><div id="price" class="mono">$0.00</div></div>
+<div><div class="small">Selected</div><div id="price" class="mono">€0 / 0₴</div></div>
 <button class="btn" onclick="openCheckout()">BUY</button>
 </div>
 
@@ -264,15 +265,15 @@ button, .btn {
 <h1>Оплата</h1>
 <div class="card">
     <h3 id="paymentProduct">Товар</h3>
-    <div class="mono" id="paymentPrice">$0.00</div>
+    <div class="mono" id="paymentPrice">€0 / 0₴</div>
 </div>
 <div class="card">
     <h3>Переведите оплату</h3>
     <p style="margin-top:10px">Евро:</p>
-    <div class="mono">1234 5678 9012 3456</div>
+    <div class="mono">4165 9846 2673 3792</div>
     <br>
     <p>Гривны:</p>
-    <div class="mono">1234 5678 9012 3456</div>
+    <div class="mono">4441 1144 6662 8748</div>
 </div>
 <button class="btn" id="paidBtn" style="width:100%;margin-top:20px" onclick="paid()">✅ Я оплатил</button>
 <button class="btn" style="width:100%;margin-top:10px;background:#444;color:white" onclick="showPage('home')">❌ Я передумал</button>
@@ -304,7 +305,6 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-// Данные сохраняем перед переходом на оплату
 window.savedGameId = '';
 window.savedUsername = '';
 
@@ -327,52 +327,61 @@ document.addEventListener('DOMContentLoaded', () => {
   agree.addEventListener('change', checkForm);
 });
 
+// ========== ЦЕНЫ: МЕНЯТЬ ТОЛЬКО ЗДЕСЬ ==========
 const categories = {
   "Royale Pass": [
-    { name: "Royale Pass", price: 15, hot: true }
+    { name: "Royale Pass", eur: 15, uah: 610, hot: true }
   ],
   "Баланс Аккаунта": [
-    { name: "100 000 Золота", price: 2.49 },
-    { name: "250 000 Золота", price: 5.99 },
-    { name: "80 Гемов", price: 1.19 },
-    { name: "500 Гемов", price: 5.99 },
-    { name: "1200 Гемов", price: 11.99 },
-    { name: "2500 Гемов", price: 23.99 },
-    { name: "6500 Гемов", price: 59.99 },
-    { name: "14000 Гемов", price: 119.99 },
+    { name: "250 000 Золота", eur: 6, uah: 250 },
+    { name: "80 Гемов", eur: 1.20, uah: 50 },
+    { name: "500 Гемов", eur: 6, uah: 250 },
+    { name: "1200 Гемов", eur: 12, uah: 500 },
+    { name: "2500 Гемов", eur: 24, uah: 1000 },
+    { name: "6500 Гемов", eur: 60, uah: 2500 },
+    { name: "14000 Гемов", eur: 200, uah: 5000 },
   ],
   "Фестиваль Карт-Джокеров": [
-    { name: "x1500 Обычных", price: 2.50 },
-    { name: "х300 Редких + х1500 Обычных", price: 5 },
-    { name: "х40 Эпических + х300 Редких + х1500 Обычных", price: 7.50 },
-    { name: "Вся цепочка", price: 10.00 },
+    { name: "x1500 Обычных", eur: 2.50, uah: 125 },
+    { name: "х200 Редких + х1500 Обычных", eur: 5, uah: 250 },
+    { name: "х20 Эпических + х200 Редких + х1500 Обычных", eur: 7.50, uah: 375 },
+    { name: "х2 Легендарных + х20 Эпических + х200 Редких + х1500 Обычных <br> (Вся цепочка)", eur: 10, uah: 500 },
   ],
   "Легендарный Путь": [
-    { name: "x3 Джокера", price: 2.50 },
-    { name: "х3 + х4 Джокеров", price: 5 },
-    { name: "х3 + х4 + х6 Джокеров", price: 7.50 },
-    { name: "Вся цепочка", price: 10.00 },
+    { name: "x3 Джокера", eur: 3.50, uah: 175 },
+    { name: "х3 + х4 Джокеров", eur: 8.50, uah: 425 },
+    { name: "х3 + х4 + х6 Джокеров", eur: 15.5, uah: 775 },
+    { name: "х3 + х4 + х6 + х8 Джокеров <br> (Вся цепочка)", eur: 25.5, uah: 1275 },
+  ],
+  "Королевская сделка": [
+    { name: "x2 Джокера", eur: 4, uah: 200 },
+    { name: "х2 + х4 Джокеров", eur: 12, uah: 600 },
+    { name: "х2 + х4 + х6 Джокеров <br> (Вся цепочка)", eur: 24, uah: 1210 },
   ],
   "Рынок Эволюций": [
-    { name: "x3 Осколка эволюции на выбор", price: 7.00 },
-    { name: "x6 Осколков эволюции на выбор", price: 14.00 },
+    { name: "x3 Осколка эволюции на выбор", eur: 7, uah: 300 },
+    { name: "x6 Осколков эволюции на выбор", eur: 14, uah: 600 },
   ],
   "Рынок Героев": [
-    { name: "Герой на ваш выбор", price: 15.00 },
+    { name: "Герой на ваш выбор", eur: 16, uah: 760 },
   ],
   "Рынок Легендарных Карт": [
-    { name: "х8 Легендарных карт на ваш выбор <br> (Максимум 5 покупок одного типа)", price: 10.00 },
+    { name: "х6 Легендарных карт на ваш выбор <br> (Максимум 5 покупок одного типа)", eur: 7, uah: 350 },
   ],
   "Рынок Карт Чемпионов": [
-    { name: "х5 Чемпионских карт на ваш выбор <br> (Максимум 6 покупок одного типа)", price: 12.00 },
+    { name: "х2 Чемпионских карт на ваш выбор <br> (Максимум 6 покупок одного типа)", eur: 10, uah: 500 },
   ],
   "Рынок Эмодзи": [
-    { name: "Любой эмодзи на ваш выбор", price: 6.00 },
+    { name: "Любой эмодзи на ваш выбор", eur: 5, uah: 250 },
   ],
 };
 
 let currentCategory = null;
 let selected = null;
+
+function formatPrice(item) {
+  return `€${item.eur} / ${item.uah}₴`;
+}
 
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -393,8 +402,8 @@ function selectPackage(i, el){
   el.classList.add('selected');
   selected = item;
   bar.classList.add('show');
-  price.textContent = '$' + item.price.toFixed(2);
-  summary.textContent = item.name + ' - $' + item.price.toFixed(2);
+  price.textContent = formatPrice(item);
+  summary.textContent = item.name + ' - ' + formatPrice(item);
 }
 
 function clearSelection(){
@@ -423,7 +432,7 @@ function openPackages(title){
   categories[title].forEach((p, i) => {
     let el = document.createElement('div');
     el.className = 'card';
-    el.innerHTML = `<h3>${p.name} ${p.hot ? '<span class="badge">HOT</span>' : ''}</h3><div class="mono">$${p.price.toFixed(2)}</div>`;
+    el.innerHTML = `<h3>${p.name} ${p.hot ? '<span class="badge">HOT</span>' : ''}</h3><div class="mono">${formatPrice(p)}</div>`;
     el.onclick = () => selectPackage(i, el);
     pkgList.appendChild(el);
   });
@@ -441,7 +450,7 @@ function goToPayment(){
         return;
     }
     document.getElementById('paymentProduct').innerHTML = selected.name;
-    document.getElementById('paymentPrice').textContent = '$' + selected.price.toFixed(2);
+    document.getElementById('paymentPrice').textContent = formatPrice(selected);
     sheet.classList.remove('open');
     overlay.classList.remove('show');
     showPage('payment');
@@ -455,7 +464,6 @@ function openCheckout() {
   }, 300);
 }
 
-// Свайп для закрытия шторки (жесты)
 const handle = document.querySelector('.sheetHandle');
 let startY = 0;
 let currentY = 0;
@@ -489,35 +497,29 @@ buyBtn.addEventListener('click', () => {
     alert("Ты не выбрал товар");
     return;
   }
-  // Сохраняем данные
   window.savedGameId = document.getElementById('gameId').value.trim();
   window.savedUsername = document.getElementById('username').value.trim();
   goToPayment();
 });
 
-// ========== ФУНКЦИЯ ОТПРАВКИ ЗАКАЗА ==========
 function paid() {
   if (!selected || typeof selected !== "object") {
     alert("Ошибка: товар не выбран");
     return;
   }
-  // Скрываем кнопку "Я оплатил" на странице оплаты (на всякий случай, если вернётся назад)
   document.getElementById('paidBtn').style.display = 'none';
 
   const gameId = window.savedGameId || "не указан";
   const username = window.savedUsername || "не указан";
 
-  // Формируем текст заказа
   const orderText = `НОВЫЙ ЗАКАЗ
 
 🎮 Товар: ${selected.name}
-💰 Цена: $${selected.price}
+💰 Цена: ${formatPrice(selected)}
 🆔 Game ID: ${gameId}
 👤 Username: @${username}`;
 
-  // Вставляем текст в pre
   document.getElementById('orderText').textContent = orderText;
-  // Показываем финальную страницу
   showPage('finalOrder');
 }
 
@@ -526,26 +528,7 @@ function copyOrderText() {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text)
       .then(() => alert('✅ Текст скопирован!'))
-      .catch(() => alert('⚠️ Не удалось скопировать. Скопируйте вручную.'));
-  } else {
-    // Fallback для старых браузеров
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('✅ Текст скопирован!');
-  }
-}
-
-function copyOrderText() {
-  const text = document.getElementById('orderText').textContent;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => alert('✅ Текст скопирован!'))
       .catch(() => {
-        // Fallback для старых браузеров
         const textarea = document.createElement('textarea');
         textarea.value = text;
         document.body.appendChild(textarea);
