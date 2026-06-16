@@ -223,7 +223,7 @@ button, .btn {
 <div class="small">Royale Pass, монеты, гемы, другие акции</div>
 </div>
 <div class="card" onclick="openServices()">
-<img src="Services_logo.png" alt="services">
+<img src="Logo1.jpg" alt="services">
 <h2>🛒 Услуги</h2>
 <div class="small">1 на 1, оценка колоды, донат</div>
 </div>
@@ -232,7 +232,7 @@ button, .btn {
 <section id="game" class="page">
 <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
   <span class="nav-link" onclick="goBack()">← BACK</span>
-  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+  <span class="nav-link" onclick="goHome()">MENU</span>
 </div>
 <h1>Clash Royale</h1>
 <div class="card" onclick="openPackages('Royale Pass')"><h3>Royale Pass</h3><p class="small">Боевой пропуск с кучей наград!</p></div>
@@ -250,10 +250,10 @@ button, .btn {
 <section id="services" class="page">
 <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
   <span class="nav-link" onclick="goBack()">← BACK</span>
-  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+  <span class="nav-link" onclick="goHome()">MENU</span>
 </div>
 <h1>Услуги</h1>
-<div class="card" onclick="openPackages('1 на 1')"><h3>1 на 1</h3><p class="small">Персональная тренировка</p></div>
+<div class="card" onclick="openPackages('Игра 1 на 1')"><h3>Игра 1 на 1</h3><p class="small">Проверь свой скил против Мортирщика</p></div>
 <div class="card" onclick="openPackages('Оценка колоды (Стрим)')"><h3>Оценка колоды (Стрим)</h3><p class="small">Разбор колоды в прямом эфире</p></div>
 <div class="card" onclick="openPackages('Оценка колоды (Приоритет)')"><h3>Оценка колоды (Приоритет)</h3><p class="small">Ускоренный разбор колоды</p></div>
 <div class="card" onclick="openPackages('Донат')"><h3>Донат-поддержка автора</h3><p class="small">Поддержи канал</p></div>
@@ -262,7 +262,7 @@ button, .btn {
 <section id="packages" class="page">
 <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
   <span class="nav-link" onclick="goBack()">← BACK</span>
-  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+  <span class="nav-link" onclick="goHome()">MENU</span>
 </div>
 <h2 id="pkgTitle">Packages</h2>
 <div id="pkgList"></div>
@@ -284,7 +284,7 @@ button, .btn {
 <section id="payment" class="page">
 <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
   <span class="nav-link" onclick="goBack()">← BACK</span>
-  <span class="nav-link" onclick="goHome()">МЕНЮ</span>
+  <span class="nav-link" onclick="goHome()">MENU</span>
 </div>
 <h1>Оплата</h1>
 <div class="card">
@@ -428,8 +428,8 @@ const categories = {
   ],
 
   // --- Услуги ---
-  "1 на 1": [
-    { name: "1 на 1 тренировка", eur: 20, uah: 1000, serviceType: "onetoone",
+  "Игра 1 на 1": [
+    { name: "Игра 1 на 1", eur: 1, uah: 50, serviceType: "onetoone",
       fields: [
         { id: "ingameNick", placeholder: "Ник в игре", label: "Ник в игре" },
         { id: "ingameId", placeholder: "ID игрока", label: "ID игрока" }
@@ -439,7 +439,7 @@ const categories = {
     }
   ],
   "Оценка колоды (Стрим)": [
-    { name: "Оценка колоды на стриме", eur: 15, uah: 750, serviceType: "deckreview",
+    { name: "Оценка колоды на стриме", eur: 1, uah: 50, serviceType: "deckreview",
       fields: [
         { id: "deckDescription", placeholder: "Опишите свою колоду...", label: "Ваша колода", big: true }
       ],
@@ -448,7 +448,7 @@ const categories = {
     }
   ],
   "Оценка колоды (Приоритет)": [
-    { name: "Приоритетная оценка колоды", eur: 25, uah: 1250, serviceType: "deckreview",
+    { name: "Приоритетная оценка колоды", eur: 1, uah: 50, serviceType: "deckreview",
       fields: [
         { id: "deckDescription", placeholder: "Опишите свою колоду...", label: "Ваша колода", big: true }
       ],
